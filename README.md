@@ -138,3 +138,7 @@ DNS 路径测试优先使用 strace 观察 socket 和 connect 系统调用。在
 | 单进程峰值 RSS (KiB) | 2916 | 55796 |
 
 这组测量中，MagicBox 的单连接内存与往返延迟较低，sing-box 的批量上传吞吐量较高。软件模拟会改变系统调用和 CPU 的相对成本。实机多连接、加密传输、热点转发与加载规则后的性能需要独立测量。逐轮读数、内核、参考发行版和二进制摘要保存在 [原始数据](docs/bench-qemu.json)。
+
+### 独立 DNS 报文库
+
+[magicbox-dns-wire](crates/dns-wire) 提供 A、AAAA 查询编码和响应校验，可单独作路径依赖。该组件只使用 Rust 的 core 和 alloc，在空 Cargo 缓存中也能离线测试。传输层的 TLS 身份校验与超时由调用方负责。

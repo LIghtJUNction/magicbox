@@ -120,7 +120,7 @@ pub fn run(config: Config, rules: Rules, port: u16) -> io::Result<()> {
         if same_endpoint(original, local)
             || original.port() == 53
             || !crate::egress::public(original.ip())
-            || !destination.permitted(config.listen, peer.addr, &rules)
+            || !peer.permits(&destination, config.listen, &rules)
         {
             return Err(bad("expected an eligible redirected public TCP connection"));
         }

@@ -113,6 +113,7 @@ name = "magicbox"
 version = "0.1.0"
 dependencies = [
  "libc",
+ "magicbox-dns-wire",
  "md-5",
  "ring",
  "rustls",
@@ -123,6 +124,10 @@ dependencies = [
  "z64",
  "zeroize",
 ]
+
+[[package]]
+name = "magicbox-dns-wire"
+version = "0.1.0"
 
 [[package]]
 name = "md-5"

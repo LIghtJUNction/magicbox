@@ -1,9 +1,9 @@
 use crate::{
     address::bad,
     config::{Endpoint, NodeSpec},
-    dns_wire,
     handshake::Wire,
 };
+use magicbox_dns_wire::{self as dns_wire, RecordType};
 use rustls::{ClientConfig, ClientConnection, pki_types::ServerName};
 use std::{
     io::{self, Read, Write},
@@ -66,10 +66,10 @@ impl Resolver {
         let mut secure = rustls::Stream::new(&mut session, &mut wire);
         static NEXT: AtomicU16 = AtomicU16::new(1);
         let a = NEXT.fetch_add(2, Ordering::Relaxed);
-        let pending = [(a, 1), (a.wrapping_add(1), 28)];
+        let pending = [(a, RecordType::A), (a.wrapping_add(1), RecordType::Aaaa)];
         let mut flight = Vec::new();
         for (id, kind) in pending {
-            let q = dns_wire::query(host, kind, id);
+            let q = dns_wire::query(host, kind, id).map_err(io::Error::other)?;
             flight.extend_from_slice(&(q.len() as u16).to_be_bytes());
             flight.extend(q);
         }
@@ -80,7 +80,7 @@ impl Resolver {
             let mut length = [0u8; 2];
             secure.read_exact(&mut length)?;
             let size = usize::from(u16::from_be_bytes(length));
-            if !(12..=16_384).contains(&size) {
+            if !(12..=dns_wire::MAX_PACKET).contains(&size) {
                 return Err(bad("invalid DNS frame size"));
             }
             let mut data = vec![0; size];
@@ -93,7 +93,10 @@ impl Resolver {
             if results[index].is_some() {
                 return Err(bad("duplicate DNS reply"));
             }
-            results[index] = Some(dns_wire::answers(&data, host, pending[index].1, id)?);
+            results[index] = Some(
+                dns_wire::answers(&data, host, pending[index].1, id)
+                    .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?,
+            );
         }
         let [v4, v6] = results.map(|set| set.unwrap_or_default());
         let count = v4.len().max(v6.len());

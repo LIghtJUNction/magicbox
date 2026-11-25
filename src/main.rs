@@ -1,6 +1,5 @@
 mod address;
 mod config;
-mod dns_wire;
 mod egress;
 mod fetch;
 mod gateway;

@@ -8,6 +8,7 @@ license = "MIT"
 description = "Bounded mixed SOCKS5 and HTTP CONNECT tunnel with upstream name resolution"
 
 [dependencies]
+magicbox-dns-wire = { path = "crates/dns-wire", version = "0.1.0" }
 ring = "0.17"
 md-5 = { version = "0.10", default-features = false }
 zeroize = { version = "1", default-features = false }

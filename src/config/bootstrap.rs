@@ -117,6 +117,39 @@ mod tests {
     use std::net::TcpListener;
 
     #[test]
+    fn rejects_the_name_and_every_pinned_endpoint() {
+        let listener = "127.0.0.1:1080".parse().unwrap();
+        let rules = Rules::default();
+        let upstream = Upstream {
+            scheme: Protocol::Socks5,
+            addr: "1.1.1.1:443".parse().unwrap(),
+            auth: None,
+            server_name: None,
+            peers: Peers {
+                name: Some("node.example".into()),
+                other: vec![
+                    "[2606:4700::1111]:443".parse().unwrap(),
+                    "8.8.8.8:443".parse().unwrap(),
+                ],
+            },
+        };
+        for raw in [
+            "node.example:443",
+            "NODE.EXAMPLE.:443",
+            "1.1.1.1:443",
+            "[2606:4700::1111]:443",
+            "[::ffff:8.8.8.8]:443",
+        ] {
+            let target = Target::parse_authority(raw).unwrap();
+            assert!(!upstream.permits(&target, listener, &rules), "{raw}");
+        }
+        for raw in ["node.example:8443", "8.8.8.8:8443", "8.8.4.4:443"] {
+            let target = Target::parse_authority(raw).unwrap();
+            assert!(upstream.permits(&target, listener, &rules), "{raw}");
+        }
+    }
+
+    #[test]
     fn tries_the_next_pinned_address_after_a_connection_failure() {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         // Linux refuses immediately on 127.0.0.2; the other peer accepts.
