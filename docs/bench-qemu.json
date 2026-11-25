@@ -1,0 +1,105 @@
+{
+  "versions": {
+    "magicbox": "magicbox 0.1.0",
+    "sing-box": "sing-box version 1.14.4"
+  },
+  "architecture": "x86_64",
+  "kernel": "6.12.117+deb13-cloud-amd64",
+  "bytes_per_trial": 33554432,
+  "rtt_samples_per_trial": 100,
+  "measurement": "SOCKS5 to SOCKS5 over loopback, remote hostname, no rules loaded",
+  "runs": {
+    "magicbox": [
+      {
+        "MiB_s": 100.21,
+        "rtt_p50_us": 420.1,
+        "rtt_p95_us": 944.71,
+        "VmHWM_KiB": 2896
+      },
+      {
+        "MiB_s": 47.16,
+        "rtt_p50_us": 486.63,
+        "rtt_p95_us": 851.28,
+        "VmHWM_KiB": 2800
+      },
+      {
+        "MiB_s": 69.7,
+        "rtt_p50_us": 523.23,
+        "rtt_p95_us": 889.44,
+        "VmHWM_KiB": 2892
+      },
+      {
+        "MiB_s": 84.22,
+        "rtt_p50_us": 537.45,
+        "rtt_p95_us": 1067.53,
+        "VmHWM_KiB": 3004
+      },
+      {
+        "MiB_s": 88.76,
+        "rtt_p50_us": 577.47,
+        "rtt_p95_us": 1122.08,
+        "VmHWM_KiB": 2904
+      },
+      {
+        "MiB_s": 88.58,
+        "rtt_p50_us": 413.83,
+        "rtt_p95_us": 573.14,
+        "VmHWM_KiB": 3016
+      },
+      {
+        "MiB_s": 107.74,
+        "rtt_p50_us": 400.68,
+        "rtt_p95_us": 641.19,
+        "VmHWM_KiB": 3004
+      }
+    ],
+    "sing-box": [
+      {
+        "MiB_s": 87.72,
+        "rtt_p50_us": 607.62,
+        "rtt_p95_us": 1401.91,
+        "VmHWM_KiB": 55544
+      },
+      {
+        "MiB_s": 80.01,
+        "rtt_p50_us": 1122.79,
+        "rtt_p95_us": 1486.39,
+        "VmHWM_KiB": 55700
+      },
+      {
+        "MiB_s": 116.93,
+        "rtt_p50_us": 585.72,
+        "rtt_p95_us": 1005.06,
+        "VmHWM_KiB": 56668
+      },
+      {
+        "MiB_s": 59.52,
+        "rtt_p50_us": 1164.6,
+        "rtt_p95_us": 1674.73,
+        "VmHWM_KiB": 55940
+      },
+      {
+        "MiB_s": 136.65,
+        "rtt_p50_us": 639.49,
+        "rtt_p95_us": 1301.34,
+        "VmHWM_KiB": 55752
+      },
+      {
+        "MiB_s": 143.9,
+        "rtt_p50_us": 564.84,
+        "rtt_p95_us": 1169.56,
+        "VmHWM_KiB": 55724
+      },
+      {
+        "MiB_s": 145.71,
+        "rtt_p50_us": 543.06,
+        "rtt_p95_us": 1281.63,
+        "VmHWM_KiB": 56128
+      }
+    ]
+  },
+  "guest": "Offline Debian kernel. QEMU 10.0.13 TCG, CPU max, 2 vCPU, 360 MiB guest RAM.",
+  "magicbox_sha256": "4b3af39d1d3bcc79b8c0795c512248b96cdbbdc4dcbf7fb3e29053c6e686d70a",
+  "sing_box_archive_sha256": "699a1b510aa4396b2176d32d1181920399ebf1e267835da6f3b598d0f7c24968",
+  "reference": "https://github.com/SagerNet/sing-box/releases/tag/v1.14.4"
+}

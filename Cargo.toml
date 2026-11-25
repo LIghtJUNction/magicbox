@@ -1,0 +1,28 @@
+[package]
+name = "magicbox"
+default-run = "magicbox"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99.1"
+license = "MIT"
+description = "Bounded mixed SOCKS5 and HTTP CONNECT tunnel with upstream name resolution"
+
+[dependencies]
+ring = "0.17"
+md-5 = { version = "0.10", default-features = false }
+zeroize = { version = "1", default-features = false }
+subtle = { version = "2.6", default-features = false }
+saphyr-parser = { version = "0.2", default-features = false }
+rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12"] }
+webpki-roots = "1"
+z64 = { git = "https://github.com/LIghtJUNction/z64.git" }
+toml = { version = "1.0", default-features = false, features = ["parse", "std", "serde"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

@@ -1,0 +1,51 @@
+name: Verify magicbox
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - run: rustup toolchain install 1.100.0 --profile minimal --component rustfmt,clippy && rustup override set 1.100.0
+      - run: cargo fmt --check && cargo clippy --locked --all-targets -- -D warnings && cargo test --locked && cargo build --locked --release
+      - run: python3 tests/tunnels.py target/release/magicbox && python3 tests/dns_path.py target/release/magicbox
+      - run: python3 tests/udp.py target/release/magicbox
+      - name: Check all three Shadowsocks TCP methods against an independent implementation
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends shadowsocks-libev
+          cc -Wall -Wextra -Werror -O2 tests/ss_interop.c -o "$RUNNER_TEMP/ss-probe"
+          sudo unshare -n sh -ec 'ip link set lo up; ip addr add 192.0.2.80/32 dev lo; export MAGICBOX_SS_ORIGIN=192.0.2.80; sh tests/shadowsocks.sh "$1" /usr/bin/ss-server "$2"' _ "$PWD/target/release/magicbox" "$RUNNER_TEMP/ss-probe"
+      - run: sudo sh tests/netns.sh target/release/magicbox
+      - name: Exercise real cgroup v2 BPF links in a private network namespace
+        run: |
+          cc -Wall -Wextra -Werror -O2 tests/dns_guard_probe.c -o "$RUNNER_TEMP/guard-probe"
+          sudo unshare --net --mount --propagation private sh tests/dns_guard.sh "$PWD/target/release/magicbox-dns-guard" "$RUNNER_TEMP/guard-probe"
+      - run: python3 tests/bench.py target/release/magicbox > benchmark.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: linux-benchmark
+          path: benchmark.json
+  android:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        target: [aarch64-linux-android, x86_64-linux-android]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - run: rustup toolchain install 1.100.0 --profile minimal --target ${{ matrix.target }} && rustup override set 1.100.0
+      - name: Cross-compile binaries against Android API 23
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          ndk="$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          linker="$ndk/${TARGET}23-clang"
+          toolvar=$(echo "$TARGET" | tr '[:lower:]-' '[:upper:]_')
+          env "CC_$TARGET=$linker" "AR_$TARGET=$ndk/llvm-ar" "CARGO_TARGET_${toolvar}_LINKER=$linker" cargo build --release --locked --target "$TARGET"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: ${{ matrix.target }}
+          path: |
+            target/${{ matrix.target }}/release/magicbox
+            target/${{ matrix.target }}/release/magicbox-dns-guard
