@@ -11,96 +11,97 @@
   "runs": {
     "magicbox": [
       {
-        "MiB_s": 78.05,
-        "rtt_p50_us": 421.84,
-        "rtt_p95_us": 578.67,
-        "VmHWM_KiB": 2916
+        "MiB_s": 82.33,
+        "rtt_p50_us": 423.94,
+        "rtt_p95_us": 857.71,
+        "VmHWM_KiB": 3100
       },
       {
-        "MiB_s": 99.84,
-        "rtt_p50_us": 693.5,
-        "rtt_p95_us": 1134.72,
-        "VmHWM_KiB": 3000
+        "MiB_s": 97.11,
+        "rtt_p50_us": 421.48,
+        "rtt_p95_us": 573.38,
+        "VmHWM_KiB": 2944
       },
       {
-        "MiB_s": 88.97,
-        "rtt_p50_us": 416.91,
-        "rtt_p95_us": 710.21,
-        "VmHWM_KiB": 2840
+        "MiB_s": 116.15,
+        "rtt_p50_us": 373.84,
+        "rtt_p95_us": 511.3,
+        "VmHWM_KiB": 2964
       },
       {
-        "MiB_s": 79.19,
-        "rtt_p50_us": 512.55,
-        "rtt_p95_us": 2547.67,
-        "VmHWM_KiB": 3076
+        "MiB_s": 88.76,
+        "rtt_p50_us": 442.2,
+        "rtt_p95_us": 773.29,
+        "VmHWM_KiB": 2744
       },
       {
-        "MiB_s": 85.85,
-        "rtt_p50_us": 471.56,
-        "rtt_p95_us": 730.56,
-        "VmHWM_KiB": 2892
+        "MiB_s": 109.45,
+        "rtt_p50_us": 402.74,
+        "rtt_p95_us": 590.83,
+        "VmHWM_KiB": 2920
       },
       {
-        "MiB_s": 91.18,
-        "rtt_p50_us": 442.86,
-        "rtt_p95_us": 930.44,
-        "VmHWM_KiB": 3092
+        "MiB_s": 81.61,
+        "rtt_p50_us": 459.21,
+        "rtt_p95_us": 623.39,
+        "VmHWM_KiB": 3028
       },
       {
-        "MiB_s": 89.67,
-        "rtt_p50_us": 409.29,
-        "rtt_p95_us": 621.78,
-        "VmHWM_KiB": 2856
+        "MiB_s": 107.22,
+        "rtt_p50_us": 383.03,
+        "rtt_p95_us": 521.61,
+        "VmHWM_KiB": 3104
       }
     ],
     "sing-box": [
       {
-        "MiB_s": 136.48,
-        "rtt_p50_us": 1091.29,
-        "rtt_p95_us": 1599.48,
-        "VmHWM_KiB": 55740
+        "MiB_s": 101.4,
+        "rtt_p50_us": 942.33,
+        "rtt_p95_us": 1412.59,
+        "VmHWM_KiB": 55148
       },
       {
-        "MiB_s": 93.58,
-        "rtt_p50_us": 834.27,
-        "rtt_p95_us": 1376.25,
-        "VmHWM_KiB": 55796
+        "MiB_s": 118.09,
+        "rtt_p50_us": 647.16,
+        "rtt_p95_us": 1249.44,
+        "VmHWM_KiB": 56076
       },
       {
-        "MiB_s": 131.77,
-        "rtt_p50_us": 586.67,
-        "rtt_p95_us": 1112.4,
-        "VmHWM_KiB": 56004
+        "MiB_s": 149.68,
+        "rtt_p50_us": 969.33,
+        "rtt_p95_us": 1407.35,
+        "VmHWM_KiB": 56284
       },
       {
-        "MiB_s": 115.62,
-        "rtt_p50_us": 1290.73,
-        "rtt_p95_us": 1817.02,
-        "VmHWM_KiB": 56292
+        "MiB_s": 91.18,
+        "rtt_p50_us": 1035.35,
+        "rtt_p95_us": 1355.29,
+        "VmHWM_KiB": 55932
       },
       {
-        "MiB_s": 107.29,
-        "rtt_p50_us": 670.9,
-        "rtt_p95_us": 866.23,
-        "VmHWM_KiB": 55776
+        "MiB_s": 120.23,
+        "rtt_p50_us": 955.45,
+        "rtt_p95_us": 1319.25,
+        "VmHWM_KiB": 56052
       },
       {
-        "MiB_s": 95.88,
-        "rtt_p50_us": 1077.31,
-        "rtt_p95_us": 1416.71,
-        "VmHWM_KiB": 55596
+        "MiB_s": 96.06,
+        "rtt_p50_us": 701.07,
+        "rtt_p95_us": 1557.2,
+        "VmHWM_KiB": 55760
       },
       {
-        "MiB_s": 115.13,
-        "rtt_p50_us": 532.97,
-        "rtt_p95_us": 957.73,
-        "VmHWM_KiB": 56408
+        "MiB_s": 132.79,
+        "rtt_p50_us": 1003.19,
+        "rtt_p95_us": 1273.15,
+        "VmHWM_KiB": 55412
       }
     ]
   },
   "guest": "Offline Debian kernel. QEMU 10.0.13 TCG, CPU max, 2 vCPU, 360 MiB guest RAM.",
-  "magicbox_sha256": "7671b5865c7c03b16afc8db825166f9ab6e272a3391cf0ac14fce225b0cd13c8",
   "sing_box_binary_sha256": "1264361b5f8868c8768f7555d3e77e20118bf503c41ac08bb290a0d99056aa3a",
   "sing_box_archive_sha256": "699a1b510aa4396b2176d32d1181920399ebf1e267835da6f3b598d0f7c24968",
-  "reference": "https://github.com/SagerNet/sing-box/releases/tag/v1.14.4"
+  "reference": "https://github.com/SagerNet/sing-box/releases/tag/v1.14.4",
+  "magicbox_sha256": "ec6cae3545fd47b7915f36880a56868ba8164b6b6851ef412dfb423fbe57aa38",
+  "magicbox_source_commit": "09ae6f572588c66782c38150af92a3765b9538f9"
 }
