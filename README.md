@@ -64,6 +64,16 @@ magicbox serve server.toml
 
 服务端限制外连目的地址，拒绝回环、私网、链路本地、运营商共享地址、组播和常用保留网段。认证在 DNS 查询和目标连接之前完成。客户端与服务端各允许 128 个并发会话。握手结束前共用 10 秒截止时间，空闲转发连接的超时时间为 5 分钟。
 
+## Linux 与 Android 的透明 TCP 入口
+
+通过以下命令复用已有客户端配置。管理员在 netfilter 中选择应用 UID 或热点接口后，将该范围的 IPv4、IPv6 公网 TCP 连接 REDIRECT 到指定端口。入口从内核连接跟踪记录读取原始 IP 和端口，转发前检查目标策略。普通连接直接访问监听端口时会被关闭。
+
+~~~sh
+magicbox redirect client.toml 19870
+~~~
+
+监听成功会输出 ready [::]:19870。端口同时服务 IPv4 和 IPv6。此入口只处理由宿主规则实际送达的 TCP，不安装系统规则。原始 IP 没有域名信息，按域名匹配的规则仅能用于显式提供域名的连接。端口 53、私网、回环和常见保留地址不会从此入口出站。系统解析器代查、独立的 UDP 流和其他应用流量需要各自的宿主策略。独立应用配置 DoH 时，HTTPS 连接可以跟随选定的 TCP 路径。入站流量保持端到端加密语义，MagicBox 不签发代理证书。
+
 ## 订阅与规则
 
 尚未选择代理时，可以用 fetch 下载第一个 HTTPS 订阅。URL 可以通过标准输入传给进程，避免令牌出现在命令行参数中。下载在证书验证、完整读取和大小检查通过后才产生标准输出。
@@ -105,6 +115,7 @@ python3 tests/tunnels.py target/release/magicbox
 python3 tests/dns_path.py target/release/magicbox
 python3 tests/udp.py target/release/magicbox
 sudo sh tests/netns.sh target/release/magicbox
+sudo python3 tests/redirect_kernel.py target/release/magicbox
 python3 tests/bench.py target/release/magicbox
 python3 tests/compare.py target/release/magicbox /path/to/reference/sing-box
 ~~~

@@ -8,6 +8,8 @@ mod handshake;
 mod http;
 mod inputs;
 mod policy;
+#[cfg(any(target_os = "linux", target_os = "android"))]
+mod redirect;
 mod relay;
 mod resolver;
 mod server;
@@ -43,9 +45,16 @@ fn execute() -> Result<(), String> {
             if command == "check-server" { println!("valid"); return Ok(()); }
             gateway.serve().map_err(|e| e.to_string())
         }
+        #[cfg(any(target_os = "linux", target_os = "android"))]
+        [command, path, port] if command == "redirect" => {
+            let config = config::Config::load(path)?;
+            let rules = policy::Rules::from_env().map_err(|e| e.to_string())?;
+            let port = port.parse().map_err(|_| "invalid redirect port")?;
+            redirect::run(config, rules, port).map_err(|e|e.to_string())
+        }
         [command, url] if command == "fetch" => fetch::cli(url),
         [command, rest @ ..] if command == "import" => inputs::cli(rest),
-        _ => Err("usage: magicbox check FILE | run FILE | serve FILE | check-server FILE | fetch URL|- | import FILE|- | --version".into()),
+        _ => Err("usage: magicbox check FILE | run FILE | serve FILE | check-server FILE | redirect FILE PORT | fetch URL|- | import FILE|- | --version".into()),
     }
 }
 

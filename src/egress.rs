@@ -9,7 +9,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-fn public(ip: IpAddr) -> bool {
+pub(crate) fn public(ip: IpAddr) -> bool {
     match ip.to_canonical() {
         IpAddr::V4(ip) => {
             let [a, b, c, _] = ip.octets();

@@ -18,6 +18,7 @@ jobs:
           cc -Wall -Wextra -Werror -O2 tests/ss_interop.c -o "$RUNNER_TEMP/ss-probe"
           sudo unshare -n sh -ec 'ip link set lo up; ip addr add 192.0.2.80/32 dev lo; export MAGICBOX_SS_ORIGIN=192.0.2.80; sh tests/shadowsocks.sh "$1" /usr/bin/ss-server "$2"' _ "$PWD/target/release/magicbox" "$RUNNER_TEMP/ss-probe"
       - run: sudo sh tests/netns.sh target/release/magicbox
+      - run: sudo python3 tests/redirect_kernel.py target/release/magicbox
       - name: Exercise real cgroup v2 BPF links in a private network namespace
         run: |
           cc -Wall -Wextra -Werror -O2 tests/dns_guard_probe.c -o "$RUNNER_TEMP/guard-probe"
