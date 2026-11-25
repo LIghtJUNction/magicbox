@@ -11,95 +11,96 @@
   "runs": {
     "magicbox": [
       {
-        "MiB_s": 100.21,
-        "rtt_p50_us": 420.1,
-        "rtt_p95_us": 944.71,
-        "VmHWM_KiB": 2896
+        "MiB_s": 78.05,
+        "rtt_p50_us": 421.84,
+        "rtt_p95_us": 578.67,
+        "VmHWM_KiB": 2916
       },
       {
-        "MiB_s": 47.16,
-        "rtt_p50_us": 486.63,
-        "rtt_p95_us": 851.28,
-        "VmHWM_KiB": 2800
+        "MiB_s": 99.84,
+        "rtt_p50_us": 693.5,
+        "rtt_p95_us": 1134.72,
+        "VmHWM_KiB": 3000
       },
       {
-        "MiB_s": 69.7,
-        "rtt_p50_us": 523.23,
-        "rtt_p95_us": 889.44,
+        "MiB_s": 88.97,
+        "rtt_p50_us": 416.91,
+        "rtt_p95_us": 710.21,
+        "VmHWM_KiB": 2840
+      },
+      {
+        "MiB_s": 79.19,
+        "rtt_p50_us": 512.55,
+        "rtt_p95_us": 2547.67,
+        "VmHWM_KiB": 3076
+      },
+      {
+        "MiB_s": 85.85,
+        "rtt_p50_us": 471.56,
+        "rtt_p95_us": 730.56,
         "VmHWM_KiB": 2892
       },
       {
-        "MiB_s": 84.22,
-        "rtt_p50_us": 537.45,
-        "rtt_p95_us": 1067.53,
-        "VmHWM_KiB": 3004
+        "MiB_s": 91.18,
+        "rtt_p50_us": 442.86,
+        "rtt_p95_us": 930.44,
+        "VmHWM_KiB": 3092
       },
       {
-        "MiB_s": 88.76,
-        "rtt_p50_us": 577.47,
-        "rtt_p95_us": 1122.08,
-        "VmHWM_KiB": 2904
-      },
-      {
-        "MiB_s": 88.58,
-        "rtt_p50_us": 413.83,
-        "rtt_p95_us": 573.14,
-        "VmHWM_KiB": 3016
-      },
-      {
-        "MiB_s": 107.74,
-        "rtt_p50_us": 400.68,
-        "rtt_p95_us": 641.19,
-        "VmHWM_KiB": 3004
+        "MiB_s": 89.67,
+        "rtt_p50_us": 409.29,
+        "rtt_p95_us": 621.78,
+        "VmHWM_KiB": 2856
       }
     ],
     "sing-box": [
       {
-        "MiB_s": 87.72,
-        "rtt_p50_us": 607.62,
-        "rtt_p95_us": 1401.91,
-        "VmHWM_KiB": 55544
+        "MiB_s": 136.48,
+        "rtt_p50_us": 1091.29,
+        "rtt_p95_us": 1599.48,
+        "VmHWM_KiB": 55740
       },
       {
-        "MiB_s": 80.01,
-        "rtt_p50_us": 1122.79,
-        "rtt_p95_us": 1486.39,
-        "VmHWM_KiB": 55700
+        "MiB_s": 93.58,
+        "rtt_p50_us": 834.27,
+        "rtt_p95_us": 1376.25,
+        "VmHWM_KiB": 55796
       },
       {
-        "MiB_s": 116.93,
-        "rtt_p50_us": 585.72,
-        "rtt_p95_us": 1005.06,
-        "VmHWM_KiB": 56668
+        "MiB_s": 131.77,
+        "rtt_p50_us": 586.67,
+        "rtt_p95_us": 1112.4,
+        "VmHWM_KiB": 56004
       },
       {
-        "MiB_s": 59.52,
-        "rtt_p50_us": 1164.6,
-        "rtt_p95_us": 1674.73,
-        "VmHWM_KiB": 55940
+        "MiB_s": 115.62,
+        "rtt_p50_us": 1290.73,
+        "rtt_p95_us": 1817.02,
+        "VmHWM_KiB": 56292
       },
       {
-        "MiB_s": 136.65,
-        "rtt_p50_us": 639.49,
-        "rtt_p95_us": 1301.34,
-        "VmHWM_KiB": 55752
+        "MiB_s": 107.29,
+        "rtt_p50_us": 670.9,
+        "rtt_p95_us": 866.23,
+        "VmHWM_KiB": 55776
       },
       {
-        "MiB_s": 143.9,
-        "rtt_p50_us": 564.84,
-        "rtt_p95_us": 1169.56,
-        "VmHWM_KiB": 55724
+        "MiB_s": 95.88,
+        "rtt_p50_us": 1077.31,
+        "rtt_p95_us": 1416.71,
+        "VmHWM_KiB": 55596
       },
       {
-        "MiB_s": 145.71,
-        "rtt_p50_us": 543.06,
-        "rtt_p95_us": 1281.63,
-        "VmHWM_KiB": 56128
+        "MiB_s": 115.13,
+        "rtt_p50_us": 532.97,
+        "rtt_p95_us": 957.73,
+        "VmHWM_KiB": 56408
       }
     ]
   },
   "guest": "Offline Debian kernel. QEMU 10.0.13 TCG, CPU max, 2 vCPU, 360 MiB guest RAM.",
-  "magicbox_sha256": "4b3af39d1d3bcc79b8c0795c512248b96cdbbdc4dcbf7fb3e29053c6e686d70a",
+  "magicbox_sha256": "7671b5865c7c03b16afc8db825166f9ab6e272a3391cf0ac14fce225b0cd13c8",
+  "sing_box_binary_sha256": "1264361b5f8868c8768f7555d3e77e20118bf503c41ac08bb290a0d99056aa3a",
   "sing_box_archive_sha256": "699a1b510aa4396b2176d32d1181920399ebf1e267835da6f3b598d0f7c24968",
   "reference": "https://github.com/SagerNet/sing-box/releases/tag/v1.14.4"
 }
