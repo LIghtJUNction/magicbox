@@ -10,7 +10,7 @@ MagicBox 是给应用和网关使用的 Rust 代理。客户端在同一个回�
 cargo build --locked --release --bin magicbox
 ~~~
 
-在私有文件 client.toml 中填入你实际拥有的代理 IP、证书域名和凭据。下面使用文档保留地址。
+在私有文件 client.toml 中填入你的代理地址、证书域名和凭据。下面使用文档保留地址。
 
 ~~~toml
 upstream = "https://alice:REPLACE_WITH_PASSWORD@192.0.2.10:8443?server_name=proxy.example"
@@ -30,12 +30,14 @@ curl --proxy socks5h://127.0.0.1:1080 https://example.org/
 
 | 上游方案 | 身份与传输 |
 | --- | --- |
-| https | TLS 验证公开 CA 和服务端名称。省略 server_name 时验证证书的 IP SAN。可选 HTTP Basic 凭据位于 TLS 内 |
+| https | TLS 验证公开 CA 和服务端名称。域名节点默认验证原始节点域名，数字 IP 节点默认验证证书的 IP SAN。可选 HTTP Basic 凭据位于 TLS 内 |
 | socks5 | 支持无认证和 RFC 1929 用户名密码。远程链路上的凭据与数据使用明文 |
 | http | 支持 HTTP CONNECT 和可选 Basic。远程链路上的凭据与数据使用明文 |
 | ss | Shadowsocks AEAD TCP 客户端，支持 aes-128-gcm、aes-256-gcm、chacha20-ietf-poly1305；与 Debian shadowsocks-libev 实测互通 |
 
-上游连接使用数字 IP。用户名与密码中的 URI 特殊字符可以百分号编码。私有 CA 通过 MAGICBOX_CA_BUNDLE 指定 PEM 文件。配置不含 upstream 时，监听器可以启动，所有转发请求都会被拒绝。上游连接失败时，客户端向本地应用返回失败。
+上游可填写数字 IP 或完整域名。导入订阅和检查配置均在离线状态完成。启动域名节点时，核心向数字地址指定的 DNS-over-TLS 服务发送 A 和 AAAA 查询，两个查询共用一次发送和 5 秒限时。默认解析器为 1.1.1.1，验证 cloudflare-dns.com，可通过 MAGICBOX_RESOLVER 指定其他可信的 tls://IP:PORT?server_name=NAME。解析器能看到被选节点的域名。核心只接受可路由的公网结果，排除本机接口地址，固定结果直到重启。每次连接在原握手限时内尝试其他可用 IP。解析或证书验证失败会终止对应操作。内网和 Tailscale 服务可显式填写数字 IP。
+
+用户名与密码中的 URI 特殊字符可以百分号编码。私有 CA 通过 MAGICBOX_CA_BUNDLE 指定 PEM 文件。配置不含 upstream 时，监听器可以启动，所有转发请求都会被拒绝。上游连接失败时，客户端向本地应用返回失败。
 
 ## 运行自己的代理服务器
 

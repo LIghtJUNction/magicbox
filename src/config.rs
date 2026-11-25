@@ -1,10 +1,9 @@
+mod bootstrap;
+mod endpoint;
 pub(crate) mod ss_uri;
+pub(crate) use endpoint::Endpoint;
 
-use std::{
-    fs::File,
-    io::Read,
-    net::{IpAddr, SocketAddr},
-};
+use std::{fs::File, io::Read, net::SocketAddr};
 
 pub(crate) enum Protocol {
     Socks5,
@@ -13,14 +12,22 @@ pub(crate) enum Protocol {
     Shadowsocks,
 }
 
+pub(crate) struct NodeSpec {
+    pub scheme: Protocol,
+    pub addr: Endpoint,
+    pub server_name: Option<String>,
+    pub auth: Option<(Vec<u8>, Vec<u8>)>,
+}
+
 pub(crate) struct Upstream {
     pub scheme: Protocol,
     pub addr: SocketAddr,
     pub server_name: Option<String>,
     pub auth: Option<(Vec<u8>, Vec<u8>)>,
+    peers: bootstrap::Peers,
 }
 
-impl Upstream {
+impl NodeSpec {
     pub fn parse(uri: &str) -> Result<Self, &'static str> {
         let (scheme, authority) = uri.split_once("://").ok_or("invalid upstream URL")?;
         let scheme = match scheme {
@@ -58,7 +65,7 @@ impl Upstream {
                 (address, Some(pair))
             }
         };
-        let addr = parse_address(address)?;
+        let addr = address.parse()?;
         Ok(Self {
             scheme,
             addr,
@@ -66,21 +73,6 @@ impl Upstream {
             server_name,
         })
     }
-}
-
-fn parse_address(address: &str) -> Result<SocketAddr, &'static str> {
-    let addr: SocketAddr = address
-        .parse()
-        .map_err(|_| "upstream requires a numeric IP and port")?;
-    let ip = addr.ip().to_canonical();
-    if addr.port() == 0
-        || ip.is_multicast()
-        || ip.is_unspecified()
-        || matches!(ip, IpAddr::V4(v4) if v4.is_broadcast())
-    {
-        return Err("invalid upstream endpoint");
-    }
-    Ok(addr)
 }
 
 fn decode_field(value: &str) -> Result<Vec<u8>, &'static str> {
@@ -118,14 +110,14 @@ fn decode_bounded(value: &str, limit: usize) -> Result<Vec<u8>, &'static str> {
     Ok(result)
 }
 
-pub(crate) struct Config {
+pub(crate) struct Config<A = Upstream> {
     pub listen: SocketAddr,
-    pub upstream: Option<Upstream>,
+    pub upstream: Option<A>,
     pub tls: Option<std::sync::Arc<rustls::ClientConfig>>,
 }
 
-impl Config {
-    pub fn load(path: &str) -> Result<Self, String> {
+impl Config<NodeSpec> {
+    pub fn read(path: &str) -> Result<Self, String> {
         let mut raw = String::new();
         File::open(path)
             .and_then(|f| f.take(65_537).read_to_string(&mut raw))
@@ -153,7 +145,7 @@ impl Config {
         }
         let upstream = field("upstream")?
             .as_deref()
-            .map(Upstream::parse)
+            .map(NodeSpec::parse)
             .transpose()?;
         if !table.is_empty() {
             return Err("unknown TOML key".into());
@@ -162,13 +154,28 @@ impl Config {
             Some(u) if matches!(u.scheme, Protocol::Https) => Some(crate::tls::trust()?),
             _ => None,
         };
-        let config = Self {
+        if let Some(u) = &upstream
+            && let Endpoint::Ip(addr) = u.addr
+            && same_endpoint(addr, listen)
+        {
+            return Err("upstream points to the listener".into());
+        }
+        Ok(Self {
             listen,
             upstream,
             tls,
-        };
-        config.check_listener(listen)?;
-        Ok(config)
+        })
+    }
+}
+
+impl Config {
+    pub fn load(path: &str) -> Result<Self, String> {
+        let spec = Config::read(path)?;
+        Ok(Self {
+            listen: spec.listen,
+            upstream: spec.upstream.map(NodeSpec::activate).transpose()?,
+            tls: spec.tls,
+        })
     }
 
     pub fn check_listener(&self, addr: SocketAddr) -> Result<(), &'static str> {

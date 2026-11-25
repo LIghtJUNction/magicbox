@@ -130,9 +130,7 @@ pub fn cli(argument: &str) -> Result<(), String> {
     {
         return Err("invalid subscription user agent".into());
     }
-    let resolver = Resolver::new(
-        &env::var("MAGICBOX_RESOLVER").unwrap_or_else(|_| crate::resolver::DEFAULT.into()),
-    )?;
+    let resolver = Resolver::from_env()?;
     let roots = crate::tls::trust()?;
     let rules = Rules::from_env().map_err(|e| e.to_string())?;
     let deadline = Instant::now() + Duration::from_secs(20);

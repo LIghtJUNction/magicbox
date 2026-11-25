@@ -6,6 +6,7 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <netdb.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/socket.h>
@@ -19,6 +20,12 @@ static void record(const char *event) {
         dprintf(fd, "%s\n", event);
         close(fd);
     }
+}
+int getaddrinfo(const char *node, const char *service, const struct addrinfo *hints,
+                struct addrinfo **res) {
+    (void)node; (void)service; (void)hints; (void)res;
+    record("system-dns");
+    return EAI_FAIL;
 }
 int socket(int domain, int type, int protocol) {
     int (*real_socket)(int,int,int) = dlsym(RTLD_NEXT, "socket");

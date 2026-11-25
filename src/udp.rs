@@ -8,7 +8,7 @@ use crate::{
 };
 use std::{
     io::{self, Write},
-    net::{Ipv4Addr, Ipv6Addr, SocketAddr, TcpStream, UdpSocket},
+    net::{Ipv4Addr, Ipv6Addr, SocketAddr, UdpSocket},
     os::fd::AsRawFd,
     time::{Duration, Instant},
 };
@@ -43,6 +43,7 @@ fn upstream_relay(
     control: &mut Wire<'_>,
     upstream: &Upstream,
     addr: SocketAddr,
+    peer: SocketAddr,
 ) -> io::Result<SocketAddr> {
     socks::authenticate(control, upstream)?;
     let mut request = vec![5, 3, 0];
@@ -58,11 +59,10 @@ fn upstream_relay(
     let port = u16::from_be_bytes(control.bytes()?);
     // A wildcard denotes the peer on the authenticated TCP control channel.
     // A different relay host requires an explicit trust policy.
-    if port == 0 || (!ip.is_unspecified() && ip.to_canonical() != upstream.addr.ip().to_canonical())
-    {
+    if port == 0 || (!ip.is_unspecified() && ip.to_canonical() != peer.ip().to_canonical()) {
         return Err(bad("unexpected UDP relay endpoint"));
     }
-    Ok(SocketAddr::new(upstream.addr.ip(), port))
+    Ok(SocketAddr::new(peer.ip(), port))
 }
 
 pub(crate) fn associate(
@@ -77,12 +77,13 @@ pub(crate) fn associate(
         return socks::reply(&mut inbound, 2);
     }
     let local = UdpSocket::bind(SocketAddr::new(listener.ip(), 0))?;
-    let mut control = match TcpStream::connect_timeout(&upstream.addr, inbound.remaining()?) {
+    let mut control = match upstream.connect(inbound.deadline) {
         Ok(s) => s,
         Err(_) => return socks::reply(&mut inbound, 1),
     };
     // Bind on the same local interface the kernel chose for the upstream TCP connection.
     let remote = UdpSocket::bind(SocketAddr::new(control.local_addr()?.ip(), 0))?;
+    let control_peer = control.peer_addr()?;
     let mut wire = Wire {
         stream: &mut control,
         deadline: inbound.deadline,
@@ -91,13 +92,14 @@ pub(crate) fn associate(
         &mut wire,
         upstream,
         SocketAddr::new(
-            if upstream.addr.is_ipv4() {
+            if control_peer.is_ipv4() {
                 Ipv4Addr::UNSPECIFIED.into()
             } else {
                 Ipv6Addr::UNSPECIFIED.into()
             },
             0,
         ),
+        control_peer,
     ) {
         Ok(addr) => addr,
         Err(_) => return socks::reply(&mut inbound, 1),
@@ -147,7 +149,7 @@ pub(crate) fn associate(
             let (len, from) = local.recv_from(&mut buf)?;
             if from.ip() == peer
                 && client.is_none_or(|p| p == from)
-                && target(&buf[..len]).is_some_and(|t| t.permitted(listener, upstream.addr, rules))
+                && target(&buf[..len]).is_some_and(|t| upstream.permits(&t, listener, rules))
             {
                 remote.send(&buf[..len])?;
                 client = Some(from);

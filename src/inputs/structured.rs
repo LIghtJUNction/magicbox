@@ -1,7 +1,7 @@
 //! A structured node can acquire transport/security semantics from optional
 //! keys. Import only nodes whose options are understood by this runtime.
 use super::{MAX_ENTRIES, Node, escape, protocol};
-use std::net::{IpAddr, SocketAddr};
+use crate::config::Endpoint;
 use toml::{Table, Value};
 
 enum Shape {
@@ -135,19 +135,17 @@ fn shadowsocks(node: &Table, shape: &Shape) -> Result<String, &'static str> {
     Node::from_uri(&uri)?.uri
 }
 
-fn address(node: &Table, port_key: &str) -> Result<SocketAddr, &'static str> {
-    let ip: IpAddr = node
+fn address(node: &Table, port_key: &str) -> Result<Endpoint, &'static str> {
+    let host = node
         .get("server")
         .and_then(Value::as_str)
-        .ok_or("missing server")?
-        .parse()
-        .map_err(|_| "upstream requires a numeric IP")?;
+        .ok_or("missing server")?;
     let port = node
         .get(port_key)
         .and_then(Value::as_integer)
         .and_then(|p| u16::try_from(p).ok())
         .ok_or("invalid server port")?;
-    Ok(SocketAddr::new(ip, port))
+    Endpoint::from_host(host, port)
 }
 
 fn convert(node: &Table, shape: &Shape, kind: &str) -> Result<String, &'static str> {
@@ -222,6 +220,28 @@ fn convert(node: &Table, shape: &Shape, kind: &str) -> Result<String, &'static s
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn domain_nodes_round_trip_across_subscription_dialects() {
+        let fixtures = [
+            (
+                r#"{"proxies":[{"type":"http","server":"HK.Example.","port":443,"tls":true}]}"#,
+                "https://hk.example:443",
+            ),
+            (
+                r#"{"outbounds":[{"type":"socks","server":"hk.example","server_port":1080}]}"#,
+                "socks5://hk.example:1080",
+            ),
+            (
+                r#"{"version":1,"servers":[{"method":"aes-128-gcm","password":"x","server":"hk.example","server_port":8388}]}"#,
+                "ss://YWVzLTEyOC1nY206eA@hk.example:8388",
+            ),
+        ];
+        for (feed, expected) in fixtures {
+            assert_eq!(nodes(feed).unwrap().remove(0).uri.unwrap(), expected);
+            assert_eq!(Node::from_uri(expected).unwrap().uri.unwrap(), expected);
+        }
+    }
 
     #[test]
     fn sip008_clash_and_sing_select_the_same_classic_tcp_node() {

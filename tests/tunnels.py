@@ -197,7 +197,7 @@ class Tunnels(unittest.TestCase):
             'listen="0.0.0.0:9999"',
             'listen="[::]:9999"',
             'listen="127.0.0.1:1234"\nupstream="socks5://[::ffff:127.0.0.1]:1234"',
-            'upstream="http://example.com:443"',
+            'upstream="http://proxy.home.arpa:443"',
             'upstream="socks5://u:super-secret@invalid"',
             'listen = "wrong"\\n',
             'extra_key = 1',

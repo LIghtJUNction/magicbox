@@ -30,13 +30,13 @@ fn execute() -> Result<(), String> {
             Ok(())
         }
         [command, path] if command == "check" || command == "run" => {
-            let config = config::Config::load(path)?;
             let rules = policy::Rules::from_env().map_err(|e| e.to_string())?;
             if command == "check" {
+                config::Config::read(path)?;
                 println!("valid");
                 return Ok(());
             }
-            server::run(config, rules).map_err(|e| e.to_string())
+            server::run(config::Config::load(path)?, rules).map_err(|e| e.to_string())
         }
         [command, path] if command == "serve" || command == "check-server" => {
             let gateway = gateway::Gateway::load(path)?;

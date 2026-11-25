@@ -9,7 +9,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-fn public(ip: IpAddr) -> bool {
+pub(crate) fn public(ip: IpAddr) -> bool {
     match ip.to_canonical() {
         IpAddr::V4(ip) => {
             let [a, b, c, _] = ip.octets();
@@ -37,7 +37,7 @@ fn public(ip: IpAddr) -> bool {
     }
 }
 
-fn local_interface(ip: IpAddr) -> io::Result<bool> {
+pub(crate) fn local_interface(ip: IpAddr) -> io::Result<bool> {
     // A connected UDP descriptor asks the kernel which source address it would
     // select. No bytes are sent. Reject services on this host's own public IPs.
     let probe = UdpSocket::bind(if ip.is_ipv4() { "0.0.0.0:0" } else { "[::]:0" })?;
