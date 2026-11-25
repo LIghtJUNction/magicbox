@@ -1,7 +1,5 @@
-//! SIP002 plus legacy Base64(method:password@address). Only the numeric
-//! upstream address is dialled; plugins are outside the transport contract.
-use super::{Protocol, Upstream, decode_bounded, parse_address};
-use std::net::SocketAddr;
+//! SIP002 plus legacy Base64(method:password@address). Named servers are resolved only on activation; plugins are outside the transport contract.
+use super::{Endpoint, NodeSpec, Protocol, decode_bounded};
 
 fn base64(raw: &str) -> Result<Vec<u8>, &'static str> {
     if raw.len() > 8192 {
@@ -29,13 +27,13 @@ fn pair(raw: &[u8]) -> Result<(&[u8], &[u8]), &'static str> {
     Ok((&raw[..index], &raw[index + 1..]))
 }
 
-pub fn parse(authority: &str) -> Result<Upstream, &'static str> {
+pub fn parse(authority: &str) -> Result<NodeSpec, &'static str> {
     if authority.contains(['?', '#']) || authority.len() > 8192 {
         return Err("unsupported Shadowsocks URI options or length");
     }
     let (addr, method, password) = match authority.rsplit_once('@') {
         Some((info, addr)) => {
-            let addr = parse_address(addr.strip_suffix('/').unwrap_or(addr))?;
+            let addr = addr.strip_suffix('/').unwrap_or(addr).parse()?;
             let (method, password) = match info.split_once(':') {
                 Some((m, p)) => (decode_bounded(m, 64)?, decode_bounded(p, 4096)?),
                 None => {
@@ -55,7 +53,7 @@ pub fn parse(authority: &str) -> Result<Upstream, &'static str> {
             let addr = std::str::from_utf8(&decoded[index + 1..])
                 .map_err(|_| "invalid Shadowsocks address")?;
             let (method, password) = pair(&decoded[..index])?;
-            (parse_address(addr)?, method.to_vec(), password.to_vec())
+            (addr.parse()?, method.to_vec(), password.to_vec())
         }
     };
     if !crate::shadowsocks::supported(&method) {
@@ -64,7 +62,7 @@ pub fn parse(authority: &str) -> Result<Upstream, &'static str> {
     if password.is_empty() || password.len() > 4096 || password.iter().any(u8::is_ascii_control) {
         return Err("invalid Shadowsocks password");
     }
-    Ok(Upstream {
+    Ok(NodeSpec {
         scheme: Protocol::Shadowsocks,
         addr,
         auth: Some((method, password)),
@@ -72,7 +70,7 @@ pub fn parse(authority: &str) -> Result<Upstream, &'static str> {
     })
 }
 
-pub fn format(addr: SocketAddr, method: &[u8], password: &[u8]) -> String {
+pub fn format(addr: Endpoint, method: &[u8], password: &[u8]) -> String {
     let mut secret = Vec::with_capacity(method.len() + 1 + password.len());
     secret.extend_from_slice(method);
     secret.push(b':');
@@ -117,11 +115,11 @@ mod tests {
         }
     }
     #[test]
-    fn plugin_stream_cipher_hostname_and_control_refused() {
+    fn plugin_stream_cipher_local_hostname_and_control_refused() {
         for link in [
             "aes-128-gcm:test@127.0.0.1:80/?plugin=x",
             "rc4-md5:test@127.0.0.1:80",
-            "aes-128-gcm:test@proxy.test:443",
+            "aes-128-gcm:test@proxy.local:443",
             "aes-128-gcm:%0d%0a@127.0.0.1:80",
             "2022-blake3-aes-128-gcm:test@127.0.0.1:80",
             "aes-128-gcm:@127.0.0.1:1080",

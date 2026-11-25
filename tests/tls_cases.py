@@ -80,4 +80,6 @@ def verified_https_cases(net):
     add_gateway_tests(VerifiedHttps, net)
     from fetch_cases import add_fetch_tests
     add_fetch_tests(VerifiedHttps, net)
+    from node_cases import add_node_tests
+    add_node_tests(VerifiedHttps, net)
     return VerifiedHttps

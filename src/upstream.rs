@@ -50,10 +50,7 @@ pub(crate) fn open(
     deadline: Instant,
     trust: Option<&Arc<rustls::ClientConfig>>,
 ) -> io::Result<(Remote, Vec<u8>)> {
-    let timeout = deadline
-        .checked_duration_since(Instant::now())
-        .ok_or_else(|| io::Error::new(io::ErrorKind::TimedOut, "handshake deadline"))?;
-    let mut socket = TcpStream::connect_timeout(&upstream.addr, timeout)?;
+    let mut socket = upstream.connect(deadline)?;
     socket.set_nodelay(true)?;
     let mut wire = Wire {
         stream: &mut socket,

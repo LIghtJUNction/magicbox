@@ -3,7 +3,7 @@ mod label;
 mod structured;
 mod yaml;
 
-use crate::config::{Protocol, Upstream};
+use crate::config::{NodeSpec, Protocol};
 use std::{
     fmt::Write as _,
     fs::File,
@@ -67,7 +67,7 @@ impl Node {
         };
         let uri = match kind {
             "socks5" | "http" | "https" => {
-                Upstream::parse(&format!("{kind}://{rest}")).map(canonical_uri)
+                NodeSpec::parse(&format!("{kind}://{rest}")).map(canonical_uri)
             }
             _ => return Ok(Self::unsupported(kind, label)),
         };
@@ -105,7 +105,7 @@ fn escape(bytes: &[u8]) -> String {
     escaped
 }
 
-fn canonical_uri(endpoint: Upstream) -> String {
+fn canonical_uri(endpoint: NodeSpec) -> String {
     let scheme = match endpoint.scheme {
         Protocol::Socks5 => "socks5",
         Protocol::Http => "http",
@@ -258,7 +258,7 @@ mod tests {
             "socks5://u:p%23@127.0.0.1:1080"
         );
         assert!(
-            Node::from_uri("http://secret:x@dns.name:80")
+            Node::from_uri("http://secret:x@dns.local:80")
                 .unwrap()
                 .uri
                 .is_err()

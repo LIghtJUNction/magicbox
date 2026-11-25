@@ -27,6 +27,23 @@ with socket.socket() as listener:
                     stream.sendall(b"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nhello\r\n1\r\n!\r\n0\r\n\r\n")
                 else:
                     stream.sendall(b"HTTP/1.1 302 Found\r\nLocation: /ready\r\nContent-Length: 0\r\n\r\n")
+    elif len(sys.argv) > 1 and sys.argv[1] == "connect":
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(sys.argv[2], sys.argv[3])
+        seen = []
+        ctx.set_servername_callback(lambda sock, name, context: seen.append(name))
+        for _ in range(2):
+            client, _ = listener.accept()
+            with ctx.wrap_socket(client, server_side=True) as stream:
+                request = bytearray()
+                while not request.endswith(b"\r\n\r\n") and len(request) < 8192:
+                    data = stream.recv(1)
+                    if not data:
+                        raise EOFError("incomplete proxy request")
+                    request.extend(data)
+                assert request.startswith(b"CONNECT no-local-resolution.invalid:443 HTTP/1.1\r\n")
+                stream.sendall(b"HTTP/1.1 200 OK\r\n\r\npayload")
+        assert seen == ["proxy.example"] * 2
     else:
         client, _ = listener.accept()
         with client:

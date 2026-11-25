@@ -20,4 +20,4 @@ for ns in "$left" "$right"; do
     "$ip_tool" -n "$ns" link set lo up
     "$ip_tool" -n "$ns" link set eth0 up
 done
-"$ip_tool" netns exec "$left" env MAGICBOX_TEST_DEST_NS="$right" python3 tunnels.py "$core" VerifiedHttps.test_client_gateway_dot_and_duplex VerifiedHttps.test_bootstrap_redirect_chunked_agent_and_private_address_denial
+"$ip_tool" netns exec "$left" env MAGICBOX_TEST_DEST_NS="$right" python3 tunnels.py "$core" VerifiedHttps.test_client_gateway_dot_and_duplex VerifiedHttps.test_bootstrap_redirect_chunked_agent_and_private_address_denial VerifiedHttps.test_named_https_node_tunnels_using_pinned_peers_and_original_identity

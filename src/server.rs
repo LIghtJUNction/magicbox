@@ -70,7 +70,7 @@ fn session(mut client: TcpStream, state: &State) -> io::Result<()> {
     let Some(upstream) = &state.config.upstream else {
         return reply(&mut inbound, 2, 403);
     };
-    if !target.permitted(state.listener, upstream.addr, &state.rules) {
+    if !upstream.permits(&target, state.listener, &state.rules) {
         return reply(&mut inbound, 2, 403);
     }
     let (remote, welcome) =
